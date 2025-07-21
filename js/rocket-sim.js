@@ -578,12 +578,6 @@ class RocketSim {
         const w = RocketSim.ROCKET.WIDTH;
         const h = RocketSim.ROCKET.LENGTH;
         
-        // Add shadow for depth perception
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.shadowBlur = 20;
-        this.ctx.shadowOffsetX = 5;
-        this.ctx.shadowOffsetY = 5;
-        
         // Main body with metallic gradient effect
         const bodyGradient = this.ctx.createLinearGradient(-w/2, 0, w/2, 0);
         bodyGradient.addColorStop(0, '#1e40af');    // Darker blue on sides
