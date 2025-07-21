@@ -75,7 +75,7 @@ class RocketSim {
      */
     static VISUAL = {
         // Starfield density (stars per pixel)
-        STAR_DENSITY: 0.00003,
+        STAR_DENSITY: 0.00005,
         
         // Number of pre-rendered plume textures for smooth animation
         PLUME_CACHE_STEPS: 20
@@ -505,13 +505,13 @@ class RocketSim {
      * Main rendering function called every frame.
      * Draws all visual elements: background, starfield, rocket, and effects.
      */
-    render() {
+    render(deltaTime) {
         // Clear canvas each frame
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw background elements first
-        this.drawStarfield();
+        this.drawStarfield(deltaTime);
         
         // Draw main rocket (this handles all rocket-related rendering)
         this.drawRocket();
@@ -788,12 +788,15 @@ class RocketSim {
      * Draw animated starfield background.
      * Creates the illusion of movement through space.
      */
-    drawStarfield() {
+    drawStarfield(deltaTime) {
         this.ctx.fillStyle = "#fff";
+        
+        // Time-based movement
+        const baseSpeed = 60; // pixels per second
         
         for (const star of this.starfield) {
             // Move stars downward to simulate forward motion
-            star.y += star.speed;
+            star.y += star.speed * baseSpeed * deltaTime;
             
             // Wrap stars around when they go off-screen
             if (star.y > this.canvas.height) {
@@ -1079,7 +1082,7 @@ class RocketSim {
         this.updatePhysics(deltaTime);
         
         // Render current frame
-        this.render();
+        this.render(deltaTime);
         
         // Schedule next frame
         requestAnimationFrame(() => this.simulationLoop());
