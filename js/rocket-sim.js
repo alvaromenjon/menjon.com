@@ -1105,6 +1105,29 @@ class RocketSim {
  * Waits for DOM to be ready before starting.
  */
 window.addEventListener('DOMContentLoaded', () => {
+    // Update instructions based on device type
+    updateInstructionsForDevice();
+    
     // Create and start the rocket simulation
     new RocketSim();
 });
+
+/**
+ * Update instructions text based on whether user is on mobile/touch device
+ */
+function updateInstructionsForDevice() {
+    const instructionsSpan = document.querySelector('#instructions span');
+    
+    // Detect if device supports touch
+    const isTouchDevice = ('ontouchstart' in window) || 
+                         (navigator.maxTouchPoints > 0) || 
+                         (navigator.msMaxTouchPoints > 0);
+    
+    if (isTouchDevice) {
+        // Mobile/touch device instructions
+        instructionsSpan.textContent = '👆 Tap to set target. Drag to spin. Release to stabilize.';
+    } else {
+        // Desktop instructions
+        instructionsSpan.textContent = '🖱️ Click to set target. Drag to spin. Release to stabilize.';
+    }
+}
