@@ -78,7 +78,10 @@ class RocketSim {
         STAR_DENSITY: 0.00005,
         
         // Number of pre-rendered plume textures for smooth animation
-        PLUME_CACHE_STEPS: 20
+        PLUME_CACHE_STEPS: 20,
+        
+        // Trail fade rate
+        TRAIL_FADE: 0.25
     };
 
     // ====================================================================
@@ -506,8 +509,9 @@ class RocketSim {
      * Draws all visual elements: background, starfield, rocket, and effects.
      */
     render(deltaTime) {
-        // Clear canvas each frame
-        this.ctx.fillStyle = '#000';
+        // Create motion blur trail effect by partially clearing the canvas
+        // Higher values = faster fade, cleaner trails
+        this.ctx.fillStyle = `rgba(0, 0, 0, ${RocketSim.VISUAL.TRAIL_FADE})`;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw background elements first
