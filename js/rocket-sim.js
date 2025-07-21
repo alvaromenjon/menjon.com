@@ -3,7 +3,7 @@
  * using RCS thrusters and a PID controller.
  * 
  * @author Álvaro Menjón
- * @version 0.1.0
+ * @version 0.2.0
  */
 
 class RocketSim {
@@ -50,11 +50,9 @@ class RocketSim {
         TIME_CONSTANT: 0.01,
         
         // Visual parameters for exhaust plume rendering
-        NOZZLE_DIAMETER: 11,  // Reference dimension for plume scaling
-        
-        // Exhaust expansion angles
-        CONE_ANGLE_15: Math.tan(15 * Math.PI / 180),  // Core jet angle
-        CONE_ANGLE_30: Math.tan(30 * Math.PI / 180)   // Full expansion angle
+        NOZZLE_DIAMETER: 11,
+        CONE_ANGLE_15: Math.tan(15 * Math.PI / 180),
+        CONE_ANGLE_30: Math.tan(30 * Math.PI / 180)
     };
     
     /**
@@ -77,7 +75,7 @@ class RocketSim {
      */
     static VISUAL = {
         // Starfield density (stars per pixel)
-        STAR_DENSITY: 0.00005,
+        STAR_DENSITY: 0.00003,
         
         // Number of pre-rendered plume textures for smooth animation
         PLUME_CACHE_STEPS: 20,
@@ -102,6 +100,7 @@ class RocketSim {
         // Initialize all simulation subsystems
         this.initializeState();        // Set up initial conditions
         this.setupCanvas();            // Configure display and viewport
+        this.createCachedAssets();     // Cache visual assets for performance
         this.preRenderPlumes();        // Generate exhaust plume textures
         this.setupInput();             // Configure mouse/touch input
         this.startSimulation();        // Begin main simulation loop
@@ -153,6 +152,64 @@ class RocketSim {
         // Visual elements
         this.starfield = [];         // Background stars for space environment
         this.plumeCache = [];        // Pre-rendered exhaust plume textures
+        
+        // Cache for performance optimizations
+        this.cachedCanvasBounds = null;
+        this.boundsCacheValid = false;
+    }
+
+    // ====================================================================
+    // ASSET CACHING FOR PERFORMANCE
+    // ====================================================================
+    
+    /**
+     * Create cached visual assets.
+     */
+    createCachedAssets() {
+        this.cachedGradients = {};
+        this.createCachedGradients();
+    }
+    
+    /**
+     * Create and cache gradients.
+     */
+    createCachedGradients() {
+        const w = RocketSim.ROCKET.WIDTH;
+        const h = RocketSim.ROCKET.LENGTH;
+        
+        // Rocket body gradient
+        this.cachedGradients.body = this.ctx.createLinearGradient(-w/2, 0, w/2, 0);
+        this.cachedGradients.body.addColorStop(0, '#1e40af');
+        this.cachedGradients.body.addColorStop(0.5, '#2563eb');
+        this.cachedGradients.body.addColorStop(1, '#1e40af');
+        
+        // Nose cone gradient
+        this.cachedGradients.nose = this.ctx.createRadialGradient(0, -h/2 - 20, 0, 0, -h/2 - 20, 30);
+        this.cachedGradients.nose.addColorStop(0, '#60a5fa');
+        this.cachedGradients.nose.addColorStop(1, '#2563eb');
+        
+        // Engine gradients
+        const exitRadius = w * 0.35;
+        const chamberRadius = w * 0.16;
+        
+        this.cachedGradients.engineBell = this.ctx.createLinearGradient(-exitRadius, 0, exitRadius, 0);
+        this.cachedGradients.engineBell.addColorStop(0, '#1a202c');
+        this.cachedGradients.engineBell.addColorStop(0.4, '#4a5568');
+        this.cachedGradients.engineBell.addColorStop(0.6, '#2d3748');
+        this.cachedGradients.engineBell.addColorStop(1, '#1a202c');
+        
+        this.cachedGradients.engineChamber = this.ctx.createLinearGradient(-chamberRadius, 0, chamberRadius, 0);
+        this.cachedGradients.engineChamber.addColorStop(0, '#1a202c');
+        this.cachedGradients.engineChamber.addColorStop(0.3, '#4a5568');
+        this.cachedGradients.engineChamber.addColorStop(0.7, '#2d3748');
+        this.cachedGradients.engineChamber.addColorStop(1, '#1a202c');
+        
+        // Engine opening gradient
+        const yExit = h/2 + w * 0.4 * 0.6 + 12 + h * 0.18;
+        this.cachedGradients.engineOpening = this.ctx.createRadialGradient(0, yExit - 2, 1, 0, yExit, exitRadius);
+        this.cachedGradients.engineOpening.addColorStop(0, '#273040');
+        this.cachedGradients.engineOpening.addColorStop(0.7, '#151b26');
+        this.cachedGradients.engineOpening.addColorStop(1, '#0b111f');
     }
 
     // ====================================================================
@@ -255,8 +312,8 @@ class RocketSim {
         // Start new thruster pulse if needed
         if (!pulse && shouldFire && Math.abs(requiredTorque) > 0.1) {
             this.rcs.activePulse = {
-                intensity: 0,                          // Start at zero intensity
-                direction: Math.sign(requiredTorque)   // +1 for clockwise, -1 for counterclockwise
+                intensity: 0,
+                direction: Math.sign(requiredTorque)
             };
         }
 
@@ -571,23 +628,17 @@ class RocketSim {
     }
 
     /**
-     * Draw the main rocket body with realistic shading and details.
-     * Includes fuselage, nose cone, and propulsion system.
+     * Draw rocket body using cached gradients.
      */
     drawRocketBody() {
         const w = RocketSim.ROCKET.WIDTH;
         const h = RocketSim.ROCKET.LENGTH;
         
-        // Main body with metallic gradient effect
-        const bodyGradient = this.ctx.createLinearGradient(-w/2, 0, w/2, 0);
-        bodyGradient.addColorStop(0, '#1e40af');    // Darker blue on sides
-        bodyGradient.addColorStop(0.5, '#2563eb');  // Brighter blue in center
-        bodyGradient.addColorStop(1, '#1e40af');    // Darker blue on sides
-        
-        this.ctx.fillStyle = bodyGradient;
+        // Use cached gradient
+        this.ctx.fillStyle = this.cachedGradients.body;
         this.ctx.fillRect(-w/2, -h/2, w, h);
         
-        // Bottom end cap with curved profile
+        // Bottom end cap
         const capHeight = w * 0.4;
         this.ctx.beginPath();
         this.ctx.moveTo(-w/2, h/2);
@@ -596,11 +647,8 @@ class RocketSim {
         this.ctx.closePath();
         this.ctx.fill();
         
-        // Nose cone
-        const noseGradient = this.ctx.createRadialGradient(0, -h/2 - 20, 0, 0, -h/2 - 20, 30);
-        noseGradient.addColorStop(0, '#60a5fa');    // Bright center
-        noseGradient.addColorStop(1, '#2563eb');    // Darker edges
-        this.ctx.fillStyle = noseGradient;
+        // Nose cone with cached gradient
+        this.ctx.fillStyle = this.cachedGradients.nose;
         
         this.ctx.beginPath();
         this.ctx.moveTo(-w/2, -h/2);
@@ -647,7 +695,7 @@ class RocketSim {
     }
 
     /**
-     * Draw the main propulsion system.
+     * Draw rocket nozzle using cached gradients.
      */
     drawRocketNozzle() {
         const w = RocketSim.ROCKET.WIDTH;
@@ -655,34 +703,20 @@ class RocketSim {
         const capHeight = w * 0.4;
         
         // Nozzle geometry based on typical rocket engine proportions
-        const chamberHeight = 12;          // Combustion chamber height
-        const chamberRadius = w * 0.16;    // Chamber radius
-        const throatRadius = w * 0.10;     // Throat radius
-        const exitRadius = w * 0.35;       // Exit radius
-        const bellHeight = h * 0.18;       // Expansion bell height
+        const chamberHeight = 12;
+        const chamberRadius = w * 0.16;
+        const throatRadius = w * 0.10;
+        const exitRadius = w * 0.35;
+        const bellHeight = h * 0.18;
         
         // Vertical positions
-        const y0 = h/2 + capHeight * 0.6;                // Chamber top
-        const yThroat = y0 + chamberHeight;              // Throat location
-        const yExit = yThroat + bellHeight;              // Nozzle exit
+        const y0 = h/2 + capHeight * 0.6;
+        const yThroat = y0 + chamberHeight;
+        const yExit = yThroat + bellHeight;
         
-        // Create gradients
-        const bellGradient = this.ctx.createLinearGradient(-exitRadius, 0, exitRadius, 0);
-        bellGradient.addColorStop(0, '#1a202c');
-        bellGradient.addColorStop(0.4, '#4a5568');
-        bellGradient.addColorStop(0.6, '#2d3748');
-        bellGradient.addColorStop(1, '#1a202c');
+        // Use cached gradients
+        this.ctx.fillStyle = this.cachedGradients.engineChamber;
         
-        const chamberGradient = this.ctx.createLinearGradient(-chamberRadius, 0, chamberRadius, 0);
-        chamberGradient.addColorStop(0, '#1a202c');
-        chamberGradient.addColorStop(0.3, '#4a5568');
-        chamberGradient.addColorStop(0.7, '#2d3748');
-        chamberGradient.addColorStop(1, '#1a202c');
-        
-        // === COMBUSTION CHAMBER ===
-        this.ctx.fillStyle = chamberGradient;
-        
-        // Chamber top end cap
         this.ctx.beginPath();
         this.ctx.ellipse(0, y0, chamberRadius, 3, 0, 0, 2 * Math.PI);
         this.ctx.fill();
@@ -707,7 +741,7 @@ class RocketSim {
         }
         
         // === NOZZLE EXPANSION BELL ===
-        this.ctx.fillStyle = bellGradient;
+        this.ctx.fillStyle = this.cachedGradients.engineBell;
         this.ctx.beginPath();
         
         // Left side of bell
@@ -732,13 +766,7 @@ class RocketSim {
         this.ctx.fill();
         
         // === NOZZLE EXIT ===
-        // Draw the dark interior of the nozzle exit
-        const openingGradient = this.ctx.createRadialGradient(0, yExit - 2, 1, 0, yExit, exitRadius);
-        openingGradient.addColorStop(0, '#273040');
-        openingGradient.addColorStop(0.7, '#151b26');
-        openingGradient.addColorStop(1, '#0b111f');
-        
-        this.ctx.fillStyle = openingGradient;
+        this.ctx.fillStyle = this.cachedGradients.engineOpening;
         this.ctx.beginPath();
         this.ctx.ellipse(0, yExit, exitRadius, 2, 0, 0, 2 * Math.PI);
         this.ctx.fill();
@@ -793,6 +821,9 @@ class RocketSim {
      * Supports both desktop and mobile devices.
      */
     setupInput() {
+        // Cache bounds initially
+        this.updateCachedBounds();
+        
         // Desktop mouse events
         this.canvas.addEventListener('mousedown', e => this.handlePointerStart(e));
         this.canvas.addEventListener('mousemove', e => this.handlePointerMove(e));
@@ -811,6 +842,14 @@ class RocketSim {
             e.preventDefault();
             this.handlePointerEnd(e.changedTouches[0]);
         });
+    }
+
+    /**
+     * Cache canvas bounds
+     */
+    updateCachedBounds() {
+        this.cachedCanvasBounds = this.canvas.getBoundingClientRect();
+        this.boundsCacheValid = true;
     }
 
     /**
@@ -871,10 +910,14 @@ class RocketSim {
      * @returns {Object} Canvas coordinates {x, y}
      */
     getPointerPosition(pointer) {
-        const rect = this.canvas.getBoundingClientRect();
+        // Use cached bounds for performance
+        if (!this.boundsCacheValid) {
+            this.updateCachedBounds();
+        }
+        
         return {
-            x: pointer.clientX - rect.left,
-            y: pointer.clientY - rect.top
+            x: pointer.clientX - this.cachedCanvasBounds.left,
+            y: pointer.clientY - this.cachedCanvasBounds.top
         };
     }
 
@@ -981,8 +1024,15 @@ class RocketSim {
             this.rocket.x = this.canvas.width / 2;
             this.rocket.y = this.canvas.height / 2;
             
-            // Regenerate starfield for new dimensions
+            // Invalidate bounds cache on resize
+            this.boundsCacheValid = false;
+            
             this.initializeStarfield();
+            
+            // Recreate gradients after resize to maintain correct dimensions
+            if (this.cachedGradients) {
+                this.createCachedGradients();
+            }
         };
         
         // Initial setup and window resize handler
