@@ -99,19 +99,88 @@ canvas {
 /* === RESPONSIVE DESIGN === */
 
 /**
- * Mobile: Adjusted sizing for smaller screens
+ * Progressive font size reduction for smaller screens
+ * Keeps text on single line while maintaining readability
  */
-@media (max-width: 480px) {
+
+/* Large tablets and small desktops */
+@media (max-width: 768px) {
+    .instructions {
+        font-size: 13px;
+        gap: 9px;
+        padding: 14px;
+        max-width: 92vw;
+    }
+    
+    .close-btn {
+        font-size: 15px;
+    }
+}
+
+/* Small tablets */
+@media (max-width: 640px) {
     .instructions {
         font-size: 12px;
         gap: 8px;
+        padding: 13px;
+        max-width: 94vw;
+    }
+    
+    .close-btn {
+        font-size: 14px;
+        padding: 2px 5px;
+    }
+}
+
+/* Large phones */
+@media (max-width: 480px) {
+    .instructions {
+        font-size: 11px;
+        gap: 7px;
         padding: 12px;
-        bottom: 10px;
+        bottom: 15px;
+        max-width: 96vw;
     }
     
     .panel {
         padding: 12px;
+        font-size: 11px;
+    }
+    
+    .close-btn {
         font-size: 13px;
+        padding: 1px 4px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+    .instructions {
+        font-size: 10px;
+        gap: 6px;
+        padding: 10px;
+        bottom: 10px;
+        max-width: 98vw;
+    }
+    
+    .close-btn {
+        font-size: 12px;
+        padding: 1px 3px;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 320px) {
+    .instructions {
+        font-size: 9px;
+        gap: 5px;
+        padding: 8px;
+        max-width: 99vw;
+    }
+    
+    .close-btn {
+        font-size: 11px;
+        padding: 1px 2px;
     }
 }
 
