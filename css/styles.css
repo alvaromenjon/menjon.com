@@ -160,6 +160,21 @@ canvas {
     transform: scale(0.95);
 }
 
+/* === COMING SOON TEXT === */
+.coming-soon-text {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e2e8f0;
+    font-family: 'Newsreader', serif;
+    font-size: 24px;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
 /* === RESPONSIVE DESIGN === */
 
 /**
