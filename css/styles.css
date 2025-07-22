@@ -91,6 +91,17 @@ canvas {
     color: #e2e8f0;
 }
 
+/* Styling for the name link to remove default underline */
+#name-panel a.name-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease-in-out;
+}
+
+#name-panel a.name-link:hover {
+    color: #fff;
+}
+
 /* Container for social icons */
 .social-icons {
     display: flex;
