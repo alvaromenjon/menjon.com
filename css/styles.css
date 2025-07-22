@@ -92,9 +92,10 @@ canvas {
 }
 
 /* Styling for the name link to remove default underline */
-#name-panel a.name-link {
+#name-panel a.name-link,
+#name-panel a.name-link:visited {
     text-decoration: none;
-    color: inherit;
+    color: #e2e8f0;
     transition: color 0.2s ease-in-out;
 }
 
