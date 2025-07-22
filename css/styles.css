@@ -2,6 +2,14 @@
  * Spacecraft/rocket attitude control simulation - Stylesheet
  */
 
+
+/* === FONTS === */
+
+/**
+ * Import custom webfonts.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:wght@500&display=swap');
+
 /* === RESET & BASE STYLES === */
 
 /**
@@ -55,7 +63,59 @@ canvas {
         0 8px 32px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     color: #fff;
+    font-family: 'Newsreader', serif;
 }
+
+/* === NAME PANEL === */
+#name-panel {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 22px;
+    font-weight: 500;
+    white-space: nowrap;
+    
+    /* Flexbox layout for alignment */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90vw;
+    max-width: 450px;
+}
+
+/* Nudge name text up slightly for better vertical alignment with Newsreader font */
+#name-panel .name {
+    position: relative;
+    top: 3px;
+    color: #e2e8f0;
+}
+
+/* Container for social icons */
+.social-icons {
+    display: flex;
+    align-items: center;
+    gap: 18px; /* Creates space between the icons */
+}
+
+/* Styling for the icon links */
+.social-icons a {
+    color: #e2e8f0;
+    display: inline-flex;
+    transition: all 0.2s ease-in-out;
+}
+
+.social-icons a:hover {
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* SVG icon sizing */
+.social-icons svg {
+    width: 22px;
+    height: 22px;
+}
+
 
 /* === INSTRUCTIONS PANEL === */
 
