@@ -214,6 +214,20 @@ canvas {
         font-size: 13px;
         padding: 1px 4px;
     }
+    #name-panel {
+        font-size: 19px;
+        padding: 10px 15px;
+    }
+    #name-panel .name {
+        top: 2px;
+    }
+    .social-icons {
+        gap: 14px;
+    }
+    .social-icons svg {
+        width: 21px;
+        height: 21px;
+    }
 }
 
 /* Small phones */
@@ -230,6 +244,16 @@ canvas {
         font-size: 12px;
         padding: 1px 3px;
     }
+    #name-panel {
+        font-size: 17px;
+    }
+    .social-icons {
+        gap: 12px;
+    }
+    .social-icons svg {
+        width: 19px;
+        height: 19px;
+    }
 }
 
 /* Very small phones */
@@ -244,6 +268,20 @@ canvas {
     .close-btn {
         font-size: 11px;
         padding: 1px 2px;
+    }
+    #name-panel {
+        font-size: 15px;
+        padding: 8px 12px;
+    }
+    #name-panel .name {
+        top: 1px;
+    }
+    .social-icons {
+        gap: 8px;
+    }
+    .social-icons svg {
+        width: 17px;
+        height: 17px;
     }
 }
 
