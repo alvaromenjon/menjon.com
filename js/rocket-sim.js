@@ -111,11 +111,15 @@ class RocketSim {
      * This includes rocket position/orientation, physics state, and visual elements.
      */
     initializeState() {
+        // Randomly generate the initial orientation angle
+        const baseAngle = Math.random() * (Math.PI / 2) + (Math.PI / 2);
+        const finalAngle = baseAngle * (Math.random() < 0.5 ? 1 : -1);
+        
         // Rocket position and orientation state
         this.rocket = {
             x: 0,                    // Screen X coordinate (set in setupCanvas)
             y: 0,                    // Screen Y coordinate (set in setupCanvas)
-            angle: 0,                // Current orientation in radians (0 = pointing up)
+            angle: finalAngle,       // Use the randomly generated angle
             isDragging: false,       // Whether user is currently dragging
             dragAngleOffset: 0       // Angular offset during drag operations
         };
@@ -126,7 +130,8 @@ class RocketSim {
         const height = RocketSim.ROCKET.LENGTH / 100;
         
         this.physics = {
-            angularVelocity: 0,      // Current rotation rate (rad/s)
+            // Random angular velocity between -1 and 1 rad/s
+            angularVelocity: (Math.random() - 0.5) * 2,
             
             // Moment of inertia
             momentOfInertia: (1/12) * RocketSim.PHYSICS.MASS * (3 * radius * radius + height * height),
