@@ -1110,13 +1110,6 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Create and start the rocket simulation
     new RocketSim();
-
-    const emailLink = document.getElementById('email-link');
-    const myEmail = '__EMAIL_PLACEHOLDER__'; 
-
-    if (emailLink && myEmail !== '__EMAIL_PLACEHOLDER__') {
-        emailLink.href = `mailto:${myEmail}`;
-    }
 });
 
 /**
